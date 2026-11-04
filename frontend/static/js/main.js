@@ -1,3 +1,18 @@
+// Grab the data from the hidden HTML element
+const dataElement = document.getElementById('project-data');
+const initialLikes = dataElement ? JSON.parse(dataElement.dataset.likes) : {};
+
+// Gumawa ng unique ID para sa browser na ito kung wala pa
+function getUserId() {
+  let userId = localStorage.getItem('portfolio_user_id');
+  if (!userId) {
+    userId = 'user_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('portfolio_user_id', userId);
+  }
+  return userId;
+}
+const currentUserId = getUserId();
+
 /* =========================================================
    PROJECT DATA
    ========================================================= */
@@ -14,12 +29,12 @@ const projects = [
     features: ["Horizontal Logo", "Vertical Logo", "Badge Logo", "App Icon"],
     year: 2026,
     tech: ["Adobe Illustrator", "GIMP"], 
-    image: "assets/BrandDesign/Horizontal logo.png",
+    image: "static/assets/BrandDesign/Horizontal logo.png",
     gallery: [
-      "assets/BrandDesign/Horizontal logo.png",
-      "assets/BrandDesign/Vertical logo.png",
-      "assets/BrandDesign/Badge logo.png",
-      "assets/BrandDesign/Icon logo.png"
+      "static/assets/BrandDesign/Horizontal logo.png",
+      "static/assets/BrandDesign/Vertical logo.png",
+      "static/assets/BrandDesign/Badge logo.png",
+      "static/assets/BrandDesign/Icon logo.png"
     ],
     url: null, github: null, role: "Brand Designer", status: "Completed"
   },
@@ -35,12 +50,12 @@ const projects = [
     features: ["Landing Page Visual", "Banner Ads", "Social Media Posts", "Newsletter Headers"],
     year: 2026,
     tech: ["Adobe Photoshop", "Canva"], 
-    image: "assets/DigitalMarketing/Landing Page.jpg", 
+    image: "static/assets/DigitalMarketing/Landing Page.jpg", 
     gallery: [
-      "assets/DigitalMarketing/Landing Page.jpg",
-      "assets/DigitalMarketing/Banner Ad.jpg",
-      "assets/DigitalMarketing/Social Media Post.jpg",
-      "assets/DigitalMarketing/Newsletter Header.jpg"
+      "static/assets/DigitalMarketing/Landing Page.jpg",
+      "static/assets/DigitalMarketing/Banner Ad.jpg",
+      "static/assets/DigitalMarketing/Social Media Post.jpg",
+      "static/assets/DigitalMarketing/Newsletter Header.jpg"
     ],
     url: null, github: null, role: "Digital Artist", status: "Completed"
   },
@@ -56,9 +71,9 @@ const projects = [
     features: ["Realistic Shading", "Custom Brushes", "High-Res Output"],
     year: 2026,
     tech: ["GIMP", "Wacom Tablet"], 
-    image: "assets/FruitDrawing/Digital Drawing.png", 
+    image: "static/assets/FruitDrawing/Digital Drawing.png", 
     gallery: [
-      "assets/FruitDrawing/Digital Drawing.png"
+      "static/assets/FruitDrawing/Digital Drawing.png"
     ],
     url: null, github: null, role: "Illustrator", status: "Completed"
   },
@@ -74,9 +89,9 @@ const projects = [
     features: ["Custom Typography", "Layout Design", "Print-Ready File"],
     year: 2026,
     tech: ["Adobe Illustrator", "Adobe Photoshop"], 
-    image: "assets/Typography/KRAV CAFE.png", 
+    image: "static/assets/Typography/KRAV CAFE.png", 
     gallery: [
-      "assets/Typography/KRAV CAFE.png"
+      "static/assets/Typography/KRAV CAFE.png"
     ],
     url: null, github: null, role: "Graphic Designer", status: "Completed"
   },
@@ -97,9 +112,9 @@ const projects = [
     ],
     year: 2026,
     tech: ["PHP", "MySQL", "JavaScript", "Bootstrap"], 
-    image: "assets/Web Development/Makiling Integrated School Login Portal.png", 
+    image: "static/assets/Web Development/Makiling Integrated School Login Portal.png", 
     gallery: [
-      "assets/Web Development/Makiling Integrated School Login Portal.png"
+      "static/assets/Web Development/Makiling Integrated School Login Portal.png"
     ],
     url: null, github: null, role: "Full-Stack Developer", status: "In Progress"
   }
@@ -110,12 +125,13 @@ const projects = [
    ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
-  initMobileMenu();
+  initMobileMenu(); 
   initProjectFilters();
   initContactForm();
   initProjectRouting();
   renderProjects(projects);
-  initGoatCounterStats(); // <--- THIS IS THE MISSING CALL
+  initGlitchBackground();
+  initAutumnLeaves();
 });
 
 /* =========================================================
@@ -152,17 +168,14 @@ function initMobileMenu() {
   const navLinks = document.getElementById("navLinks");
   const body = document.body;
 
+  // Hamburger menu logic (para sa mobile)
   hamburger.addEventListener("click", () => {
     const isOpen = navLinks.classList.toggle("active");
     hamburger.querySelector("i").className = isOpen ? "fas fa-times" : "fas fa-bars";
-    
-    if (isOpen) {
-      body.style.overflow = "hidden";
-    } else {
-      body.style.overflow = "";
-    }
+    body.style.overflow = isOpen ? "hidden" : "";
   });
 
+  // Isara ang mobile menu kapag pumindot ng link
   navLinks.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
       navLinks.classList.remove("active");
@@ -200,17 +213,20 @@ function renderProjects(list) {
     card.className = "project-card";
 
     const techTags = p.tech.map((t) => `<span>${t}</span>`).join("");
-    
     const projectVisual = p.image 
       ? `<img src="${p.image}" alt="${p.name} Preview" style="width: 100%; height: 100%; object-fit: cover;">` 
       : `<i class="fas ${p.imageIcon || 'fa-folder'}"></i>`;
 
+    const likeData = initialLikes[p.id] || { count: 0, liked_by: [] };
+    const isLiked = likeData.liked_by.includes(currentUserId);
+    
+    // Kung naka-like na, kulay pula. Kung hindi, gray.
+    const heartClass = isLiked ? "fas fa-heart liked" : "fas fa-heart";
+
     const detailsBtn = `<a href="#/projects/${p.id}" class="btn btn-sm btn-outline">View Details</a>`;
 
     card.innerHTML = `
-      <div class="project-image">
-        ${projectVisual}
-      </div>
+      <div class="project-image">${projectVisual}</div>
       <div class="project-info">
         <h3>${p.name}</h3>
         <div class="project-meta">
@@ -220,12 +236,62 @@ function renderProjects(list) {
         </div>
         <p class="project-desc">${p.description}</p>
         <div class="project-tech">${techTags}</div>
-        <div class="project-actions">
+        
+        <div class="project-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
           ${detailsBtn}
+          <button class="card-heart-btn ${isLiked ? 'active' : ''}" onclick="likeProject('${p.id}', this, ${isLiked})">
+            <i class="${heartClass}"></i> <span class="like-count">${likeData.count}</span>
+          </button>
         </div>
       </div>
     `;
     projectsGrid.appendChild(card);
+  });
+}
+
+function likeProject(projectId, btnElement, isCurrentlyLiked) {
+  if (btnElement.disabled) return;
+  btnElement.disabled = true;
+
+  fetch(`/api/like/${projectId}`, { 
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: currentUserId })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === "success") {
+      const countSpan = btnElement.querySelector('.like-count');
+      const icon = btnElement.querySelector('i');
+      
+      // Update UI base sa sagot ng Python
+      countSpan.innerText = data.new_count;
+
+      if (data.action === "liked") {
+        btnElement.classList.add('active');
+        icon.classList.add('liked');
+        
+        // Pop animation at floating heart kapag nag-like
+        btnElement.classList.add('pop');
+        const floatingHeart = document.createElement('i');
+        floatingHeart.className = 'fas fa-heart floating-heart';
+        btnElement.appendChild(floatingHeart);
+        setTimeout(() => floatingHeart.remove(), 800);
+      } else {
+        // Kapag nag-unlike, tanggalin ang kulay
+        btnElement.classList.remove('active');
+        icon.classList.remove('liked');
+      }
+
+      setTimeout(() => {
+        btnElement.classList.remove('pop');
+        btnElement.disabled = false;
+      }, 500);
+    }
+  })
+  .catch(err => {
+    console.error("Error liking project:", err);
+    btnElement.disabled = false;
   });
 }
 
@@ -430,26 +496,113 @@ function initContactForm() {
 }
 
 /* =========================================================
-   GOATCOUNTER STATS
+   SUPABASE STATS & INTERACTIONS (CV VIEWS & DOWNLOADS)
    ========================================================= */
-function initGoatCounterStats() {
-  let checkCount = setInterval(function() {
-    if (window.goatcounter && window.goatcounter.visit_count) {
-      clearInterval(checkCount);
 
-      window.goatcounter.visit_count({
-        append: '#download-count',
-        path: 'cv-download',
-        type: 'html',
-        no_branding: true
-      });
+// Function to send data to Python backend for CV stats
+function trackAction(endpoint) {
+  fetch(endpoint, { method: 'POST' })
+    .catch(err => console.error("Error tracking action:", err));
+}
 
-      window.goatcounter.visit_count({
-        append: '#view-count',
-        path: 'cv-view',
-        type: 'html',
-        no_branding: true
-      });
-    }
-  }, 200);
+// 1. Track CV View (Called when clicking View Online)
+function trackCVView() {
+  trackAction('/api/stats/view');
+  
+  let viewSpan = document.getElementById('view-count');
+  let currentVal = parseInt(viewSpan.innerText) || 0;
+  viewSpan.innerText = (currentVal + 1) + ' views';
+}
+
+// 2. Track CV Download (Called when clicking Download)
+function trackDownload() {
+  trackAction('/api/stats/download');
+  
+  let dlSpan = document.getElementById('download-count');
+  let currentVal = parseInt(dlSpan.innerText) || 0;
+  dlSpan.innerText = (currentVal + 1) + ' downloads';
+}
+
+/* =========================================================
+   DYNAMIC GLITCH BACKGROUND FOR PROFILE
+   ========================================================= */
+function initGlitchBackground() {
+  const heroContainer = document.getElementById('heroImageContainer');
+  if (!heroContainer) return;
+
+  // Function para i-update ang position base sa mouse
+  document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth) * 100;
+    const y = (e.clientY / window.innerHeight) * 100;
+    
+    // Kinukuha natin yung ::before pseudo-element
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .hero-image::before {
+        left: ${x}% !important;
+        top: ${y}% !important;
+        background: radial-gradient(circle at ${x}% ${y}%, var(--accent) 0%, rgba(30, 58, 138, 0.5) 100%) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  });
+
+  // Function para sa scroll (para mag-glitch kapag nag-scroll)
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    // Magbabago ang blur at opacity base sa scroll depth
+    heroContainer.style.setProperty('--glitch-blur', `${Math.min(scrollY / 10, 30)}px`);
+  });
+}
+
+function initScrollReveal() {
+  const sections = document.querySelectorAll('section');
+  sections.forEach(sec => sec.classList.add('reveal'));
+
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  sections.forEach(sec => observer.observe(sec));
+}
+
+/* =========================================================
+   AUTUMN FALLING LEAVES
+   ========================================================= */
+function initAutumnLeaves() {
+  const container = document.getElementById('autumn-container');
+  if (!container) return;
+
+  // Function na gumagawa ng isang dahon
+  function createLeaf() {
+    const leaf = document.createElement('div');
+    leaf.classList.add('leaf');
+    
+    // Random na laki, posisyon, at bilis
+    const size = Math.random() * 15 + 10; // 10px hanggang 25px
+    const left = Math.random() * 100; // 0% hanggang 100% ng screen width
+    const duration = Math.random() * 5 + 5; // 5s hanggang 10s bago bumagsak
+    const delay = Math.random() * 2; // Random na simula
+    
+    leaf.style.width = `${size}px`;
+    leaf.style.height = `${size}px`;
+    leaf.style.left = `${left}vw`;
+    leaf.style.animationDuration = `${duration}s`;
+    leaf.style.animationDelay = `${delay}s`;
+
+    container.appendChild(leaf);
+
+    // Burahin ang dahon pagkatapos ng animation para hindi mag-clutter ang DOM
+    setTimeout(() => {
+      leaf.remove();
+    }, (duration + delay) * 1000);
+  }
+
+  // Gumawa ng dahon bawat 500ms (kalahating segundo)
+  setInterval(createLeaf, 500);
 }

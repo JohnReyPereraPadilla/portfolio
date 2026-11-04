@@ -116,9 +116,41 @@ a:hover { color: var(--accent); }
 }
 [data-theme="dark"] .logo-icon { background: linear-gradient(135deg, #1e3a8a, var(--accent)); }
 
+/* ============================================
+   NAVBAR LINKS & HOVER UNDERLINE ANIMATION
+   ============================================ */
 .nav-links { display: flex; gap: 1.5rem; list-style: none; align-items: center; }
-.nav-links a { color: var(--text-muted); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-.nav-links a:hover { color: var(--accent); }
+
+.nav-links a { 
+  color: var(--text-muted); 
+  font-weight: 700; 
+  font-size: 0.85rem; 
+  text-transform: uppercase; 
+  letter-spacing: 1px;
+  position: relative; 
+  padding-bottom: 5px; 
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover { 
+  color: var(--accent); 
+}
+
+/* Ang magic na gumagawa ng underline */
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  width: 0; 
+  height: 2px; 
+  bottom: 0;
+  left: 0; 
+  background-color: var(--accent); 
+  transition: width 0.3s ease-in-out; 
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
 
 .nav-actions { display: flex; gap: 1rem; align-items: center; }
 .theme-toggle { background: none; border: 1px solid var(--border); border-radius: 30px; padding: 0.4rem 0.8rem; font-size: 1.1rem; cursor: pointer; color: var(--text); transition: var(--transition); }
@@ -171,6 +203,7 @@ section { padding: 5rem 0; }
   align-items: flex-end;
   justify-content: center;
   margin-top: 1rem;
+  overflow: visible;
 }
 
 .hero-image::after {
@@ -191,16 +224,19 @@ section { padding: 5rem 0; }
 .hero-image::before {
   content: '';
   position: absolute;
-  width: 250px;
-  height: 250px;
-  background: var(--accent);
+  width: 280px;
+  height: 280px;
+  /* Dynamic gradient na magbabago base sa JS */
+  background: radial-gradient(circle, var(--accent) 0%, var(--primary) 100%);
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.25;
+  filter: blur(70px);
+  opacity: 0.4;
   z-index: -1;
   top: 20%;
   left: 50%;
   transform: translateX(-50%);
+  transition: transform 0.1s ease-out, background 0.3s ease;
+  pointer-events: none; /* Para hindi makaabala sa hover */
 }
 
 .hero-image img {
@@ -209,9 +245,15 @@ section { padding: 5rem 0; }
   max-height: 105%; 
   object-fit: contain; 
   object-position: bottom; 
-  filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.6)); 
+  filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.6)) contrast(1.1) saturate(1.2);
   z-index: 1;
   position: relative;
+  overflow: visible;
+  transition: filter 0.3s ease;
+}
+
+.hero-image:hover img {
+  filter: drop-shadow(0 15px 35px var(--accent)) contrast(1.2) saturate(1.5);
 }
 
 /* ============================================
@@ -278,7 +320,6 @@ section { padding: 5rem 0; }
 .edu-card .year { display: inline-block; background: var(--tag-bg); color: var(--tag-text); padding: 0.3rem 0.8rem; border-radius: 4px; font-size: 0.85rem; font-weight: 700; }
 
 .cv-section { text-align: center; background: var(--surface); border-radius: 12px; padding: 3rem 2rem; border: 1px solid var(--border); box-shadow: var(--card-shadow); }
-.cv-buttons { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
 
 /* ============================================
    CONTACT (Fixed Layout)
@@ -452,14 +493,6 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
   gap: 0.75rem;
 }
 
-.stat-count {
-  font-size: 0.85rem;
-  color: var(--text-muted); /* Kukuhain ang kulay sa theme mo */
-  font-weight: 700;
-  font-family: 'Lato', sans-serif;
-  white-space: nowrap; /* Para hindi mag-line break ang text */
-}
-
 /* Responsive para sa mobile: ipapatong ang text sa ilalim ng button */
 @media (max-width: 600px) {
   .cv-buttons {
@@ -471,17 +504,10 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
     gap: 0.4rem;
   }
 }
-/* Hide the default "Views for this page:" text */
-#gcvc-for {
-  display: none !important;
-}
 
-/* Hide the "by GoatCounter" text */
-#gcvc-by {
-  display: none !important;
-}
+/* Hide GoatCounter text and adjust style */
+#gcvc-for, #gcvc-by { display: none !important; }
 
-/* Make the number small and inline */
 .goatcounter {
   display: inline-block !important;
   border: none !important;
@@ -491,17 +517,6 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
   width: auto !important;
 }
 
-#gcvc-views {
-  font-size: 0.85rem !important;
-  color: var(--text-muted) !important;
-  font-weight: 700 !important;
-}
-
-/* ============================================
-   GOATCOUNTER STATS (Final Override)
-   ============================================ */
-
-/* I-override ang container na may pink border */
 #gcvc {
   border: none !important;
   background: transparent !important;
@@ -514,17 +529,6 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
   width: auto !important;
 }
 
-/* Itago ang "Views for this page:" text */
-#gcvc-for {
-  display: none !important;
-}
-
-/* Itago ang "by GoatCounter" branding */
-#gcvc-by {
-  display: none !important;
-}
-
-/* Gawing maliit at maayos ang numero */
 #gcvc-views {
   font-size: 0.85rem !important;
   color: var(--text-muted) !important;
@@ -541,4 +545,179 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
   font-size: 0.75rem;
   margin-right: 0.2rem;
   color: var(--accent);
+}
+
+/* ============================================
+   HEART BUTTON & ANIMATIONS
+   ============================================ */
+.heart-section {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.heart-btn {
+  background: transparent;
+  border: none;
+  color: #ef4444; /* Red color */
+  font-size: 2.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  position: relative; /* For floating animation */
+  outline: none;
+}
+
+.heart-btn:hover {
+  transform: scale(1.1);
+}
+
+/* When the button is clicked (Pop effect) */
+.heart-btn.pop {
+  animation: pop 0.4s ease;
+}
+
+/* Floating heart animation */
+.floating-heart {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  color: #ef4444;
+  pointer-events: none;
+  animation: floatUp 0.8s ease-out forwards;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+@keyframes floatUp {
+  0% { 
+    opacity: 1; 
+    transform: translate(-50%, 0) scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translate(-50%, -50px) scale(1.5); 
+  }
+}
+
+/* ============================================
+   PROJECT CARD HEART BUTTON
+   ============================================ */
+.card-heart-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.5rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  position: relative; /* For the floating animation */
+}
+
+.card-heart-btn:hover {
+  color: #ef4444; /* Red on hover */
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.card-heart-btn i {
+  color: #ef4444;
+}
+
+/* Animation for the card button */
+.card-heart-btn.pop {
+  animation: pop 0.4s ease;
+}
+
+/* Ensure floating heart is positioned correctly inside the button */
+.card-heart-btn .floating-heart {
+  top: -10px;
+  color: #ef4444;
+  font-size: 1.2rem;
+}
+
+/* Default heart color (Gray/Outline) */
+.card-heart-btn i {
+  color: var(--text-muted); 
+  transition: color 0.3s ease;
+}
+
+/* Active heart color (Red) */
+.card-heart-btn i.liked {
+  color: #ef4444; 
+}
+
+.card-heart-btn.active {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ============================================
+   SCROLL REVEAL ANIMATION
+   ============================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+  visibility: hidden;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+html { 
+  scroll-behavior: smooth; 
+  scroll-padding-top: 80px; /* Iniiwasan nitong matakpan ng navbar ang destination */
+}
+
+/* ============================================
+   AUTUMN FALLING LEAVES
+   ============================================ */
+#autumn-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Para makapag-click ka sa likod ng leaves */
+  z-index: -1; /* Nasa likod ng lahat ng content */
+  overflow: hidden;
+}
+
+.leaf {
+  position: absolute;
+  top: -50px;
+  background-color: var(--accent); /* Gagamitin ang Gold/Bronze color mo */
+  border-radius: 0 100% 0 100%; /* Hugis dahon */
+  opacity: 0.6;
+  animation: fall linear forwards;
+}
+
+/* Iba't ibang kulay ng dahon base sa theme */
+[data-theme="dark"] .leaf { background-color: #d97706; opacity: 0.4; }
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg) translateX(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg) translateX(100px);
+    opacity: 0;
+  }
 }
