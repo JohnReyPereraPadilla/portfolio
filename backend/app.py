@@ -1,7 +1,8 @@
 import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 from dotenv import load_dotenv
 from supabase import create_client, Client
+
 
 load_dotenv()
 
@@ -101,6 +102,12 @@ def page_not_found(e):
     
     # For anything else, return the main page (so #/projects/... works)
     return render_template('index.html')
+
+@app.route('/robots.txt')
+def robots():
+    # This is the most lenient rule, allowing all crawlers to access everything
+    content = "User-agent: *\nAllow: /\n"
+    return Response(content, mimetype='text/plain')
 
 if __name__ == '__main__':
     import os
