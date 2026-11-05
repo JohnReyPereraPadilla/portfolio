@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google-site-verification" content="97skoesQjS2veLGkYJTjqMhLN7-fNYB7lZ6NZ7Gwpa8" />
   <title>John Rey Padilla | IT Student Portfolio</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon_io/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon_io/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon_io/favicon-16x16.png">
-  <link rel="manifest" href="assets/favicon_io/site.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="static/assets/favicon_io/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="static/assets/favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="static/assets/favicon_io/favicon-16x16.png">
+  <link rel="manifest" href="static/assets/favicon_io/site.webmanifest">
   <meta name="description" content="Portfolio of John Rey Padilla – 3rd Year IT Student at City College of Calamba. Explore my projects, skills, and experience." />
   <meta name="keywords" content="IT portfolio, student portfolio, web developer, graphic designer, networking, John Rey Padilla" />
   <meta name="author" content="John Rey Padilla" />
@@ -34,7 +34,6 @@
   <!-- ============ NAVBAR ============ -->
   <header class="navbar">
     <div class="container nav-container">
-      <!-- NEW CUSTOM JR LOGO -->
       <a href="#home" class="logo">
         <div class="logo-icon">JR</div>
         <span>John Rey</span>
@@ -71,7 +70,6 @@
           <div class="title">3rd Year IT Student &amp; Developer</div>
           <p>I am a passionate IT student from City College of Calamba, exploring the intersections of web development, graphic design, and networking to build systems that make a difference.</p>
           
-          <!-- STUDENT QUOTE -->
           <div class="student-quote">
             "The beautiful thing about learning is that no one can take it away from you." <br>— B.B. King
           </div>
@@ -160,7 +158,6 @@
           <p class="section-subtitle">Academic projects and real-world client work.</p>
         </div>
         <div class="timeline">
-          
           <div class="timeline-item">
             <h3>Web Developer &amp; System Designer</h3>
             <div class="meta">
@@ -186,7 +183,6 @@
               <li>Managed design projects from initial concept to final delivery.</li>
             </ul>
           </div>
-
         </div>
       </div>
     </section>
@@ -233,6 +229,10 @@
             <option value="Adobe Illustrator">Adobe Illustrator</option>
             <option value="GIMP">GIMP</option>
           </select>
+
+          <button id="addProjectBtn" style="display: none;" onclick="document.getElementById('addProjectModal').hidden = false">
+            <i class="fas fa-plus"></i> Add Project
+          </button>
         </div>
 
         <div id="projectsGrid" class="projects-grid"></div>
@@ -248,7 +248,6 @@
           <p class="section-subtitle">My academic background and professional certifications.</p>
         </div>
         <div class="edu-grid">
-          
           <div class="edu-card">
             <h3>BS in Information Technology</h3>
             <p>City College of Calamba</p>
@@ -273,7 +272,6 @@
             <p>Cisco Systems</p>
             <span class="year">2020 · ID: CSCO12987654</span>
           </div>
-
         </div>
       </div>
     </section>
@@ -290,7 +288,6 @@
           <p>Get a detailed overview of my education, skills, and project history.</p>
           
           <div class="cv-buttons">
-            <!-- Download Button -->
             <div class="cv-action-group">
               <a href="{{ url_for('static', filename='assets/cv.pdf') }}" class="btn" download onclick="trackDownload()">
                 <i class="fas fa-download"></i> Download CV (PDF)
@@ -298,7 +295,6 @@
               <span class="stat-count" id="download-count">{{ stats.cv_downloads }} downloads</span>
             </div>
 
-            <!-- View Online Button -->
             <div class="cv-action-group">
               <a href="{{ url_for('static', filename='assets/cv.pdf') }}" class="btn btn-outline" target="_blank" rel="noopener" onclick="trackCVView()">
                 <i class="fas fa-eye"></i> View Online
@@ -318,7 +314,6 @@
           <p class="section-subtitle">Have a question or want to collaborate? Send me a message.</p>
         </div>
         <div class="contact-grid">
-          
           <div class="contact-info">
             <h3>Let's Connect</h3>
             <p><i class="fas fa-envelope"></i> <a href="mailto:johnreyperera@gmail.com">johnreyperera@gmail.com</a></p>
@@ -332,16 +327,9 @@
             </div>
           </div>
 
-          <!-- UPDATED FORM WITH WEB3FORMS -->
           <form class="contact-form" id="contactForm" action="https://api.web3forms.com/submit" method="POST">
-            
-            <!-- Web3Forms Access Key -->
             <input type="hidden" name="access_key" value="e841641e-d6be-4604-9d2c-b2dfe47454ea">
-            
-            <!-- Email Subject -->
             <input type="hidden" name="subject" value="New Message from John Rey Portfolio">
-            
-            <!-- Honeypot Spam Protection -->
             <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
 
             <div class="form-group">
@@ -390,8 +378,67 @@
     </div>
   </div>
 
-<!-- Hidden element to hold the data -->
+  <!-- ADMIN ADD PROJECT MODAL -->
+  <div id="addProjectModal" class="modal" hidden>
+    <div class="modal-content" style="max-width: 600px;">
+      <button class="modal-close" onclick="document.getElementById('addProjectModal').hidden = true">&times;</button>
+      <h2 style="margin-bottom: 1.5rem; font-family: 'Playfair Display';">Add New Project</h2>
+      
+      <form id="addProjectForm" onsubmit="submitNewProject(event)">
+        <div class="form-group">
+          <label>Project Image</label>
+          <input type="file" id="pImage" accept="image/*" required />
+        </div>
+
+        <div class="form-group">
+          <label>Project Name</label>
+          <input type="text" id="pName" required placeholder="e.g. My Awesome Project" />
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Category</label>
+            <input type="text" id="pCategory" required placeholder="Web Development" />
+          </div>
+          <div class="form-group">
+            <label>Year</label>
+            <input type="number" id="pYear" required value="2026" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Role</label>
+          <input type="text" id="pRole" required placeholder="Full-Stack Developer" />
+        </div>
+        
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="pDesc" rows="2" required placeholder="Short description..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Overview</label>
+          <textarea id="pOverview" rows="3" required placeholder="Detailed overview..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Tools Used (Comma separated)</label>
+          <input type="text" id="pTech" required placeholder="HTML, CSS, JavaScript" />
+        </div>
+
+        <div class="form-group">
+          <label>Features (Comma separated)</label>
+          <input type="text" id="pFeatures" required placeholder="Responsive, Admin Dashboard" />
+        </div>
+
+        <button type="submit" class="btn" style="width: 100%;">Save Project</button>
+      </form>
+    </div>
+  </div>
+  
+<!-- Hidden elements to hold the data -->
 <div id="project-data" data-likes='{{ project_likes | tojson() | safe }}' style="display: none;"></div>
+<div id="db-project-data" data-projects='{{ db_projects | tojson() | safe }}' style="display: none;"></div>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
